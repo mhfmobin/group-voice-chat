@@ -1,7 +1,6 @@
 const peers = {};
-const chatContainer = document.getElementById('left');
-const remoteVideoContainer = document.getElementById('right');
-const toggleButton = document.getElementById('toggle-cam');
+const chatContainer = document.getElementById('container');
+const toggleButton = document.getElementById('toggle-mic');
 const roomId = window.location.pathname.split('/')[2];
 let userStream;
 let isAdmin = false;
@@ -32,7 +31,7 @@ function createPeer(userIdToCall) {
     peer.onicecandidate = handleICECandidateEvent;
     peer.ontrack = (e) => {
         const container = document.createElement('div');
-        container.classList.add('remote-video-container');
+        container.classList.add('remote-audio-container');
 
         const audio = document.createElement('audio');
         audio.srcObject = e.streams[0];
@@ -49,7 +48,7 @@ function createPeer(userIdToCall) {
             container.appendChild(button);
         }
         container.id = userIdToCall;
-        remoteVideoContainer.appendChild(container);
+        chatContainer.appendChild(container);
     }
     return peer;
 }
@@ -124,12 +123,12 @@ toggleButton.addEventListener('click', () => {
     }
 });
 
-remoteVideoContainer.addEventListener('click', (e) => {
-    if (e.target.innerHTML.includes('Hide')) {
-        e.target.innerHTML = 'show remote cam';
+chatContainer.addEventListener('click', (e) => {
+    if (e.target.innerHTML.includes('Mute')) {
+        e.target.innerHTML = 'Unmute user';
         socket.emit('hide remote cam', e.target.getAttribute('user-id'));
     } else {
-        e.target.innerHTML = `Hide user's cam`;
+        e.target.innerHTML = `Mute user`;
         socket.emit('show remote cam', e.target.getAttribute('user-id'));
     }
 })
