@@ -3,7 +3,6 @@ const chatContainer = document.getElementById('left');
 const remoteVideoContainer = document.getElementById('right');
 const toggleButton = document.getElementById('toggle-cam');
 const roomId = window.location.pathname.split('/')[2];
-const userVideo = document.getElementById('user-video');
 let userStream;
 let isAdmin = false;
 const socket = io('/');
@@ -34,15 +33,17 @@ function createPeer(userIdToCall) {
     peer.ontrack = (e) => {
         const container = document.createElement('div');
         container.classList.add('remote-video-container');
-        const video = document.createElement('video');
-        video.srcObject = e.streams[0];
-        video.autoplay = true;
-        video.playsInline = true;
-        video.classList.add("remote-video");
-        container.appendChild(video);
+
+        const audio = document.createElement('audio');
+        audio.srcObject = e.streams[0];
+        audio.autoplay = true;
+        audio.playsInline = true;
+        audio.classList.add("remote-audio");
+        container.appendChild(audio);
+
         if (isAdmin) {
             const button = document.createElement("button");
-            button.innerHTML = `Hide user's cam`;
+            button.innerHTML = `Mute user`;
             button.classList.add('button');
             button.setAttribute('user-id', userIdToCall);
             container.appendChild(button);
@@ -113,13 +114,13 @@ function handleDisconnect(userId) {
 };
 
 toggleButton.addEventListener('click', () => {
-    const videoTrack = userStream.getTracks().find(track => track.kind === 'video');
-    if (videoTrack.enabled) {
-        videoTrack.enabled = false;
-        toggleButton.innerHTML = 'Show cam'
+    const audioTrack = userStream.getTracks().find(track => track.kind === 'audio');
+    if (audioTrack.enabled) {
+        audioTrack.enabled = false;
+        toggleButton.innerHTML = 'Unmute'
     } else {
-        videoTrack.enabled = true;
-        toggleButton.innerHTML = "Hide cam"
+        audioTrack.enabled = true;
+        toggleButton.innerHTML = "Mute"
     }
 });
 
@@ -133,21 +134,20 @@ remoteVideoContainer.addEventListener('click', (e) => {
     }
 })
 
-function hideCam() {
-    const videoTrack = userStream.getTracks().find(track => track.kind === 'video');
-    videoTrack.enabled = false;
+function mute() {
+    const audioTrack = userStream.getTracks().find(track => track.kind === 'audio');
+    audioTrack.enabled = false;
 }
 
-function showCam() {
-    const videoTrack = userStream.getTracks().find(track => track.kind === 'video');
-    videoTrack.enabled = true;
+function unmute() {
+    const audioTrack = userStream.getTracks().find(track => track.kind === 'audio');
+    audioTrack.enabled = true;
 }
 
 async function init() {
     socket.on('connect', async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         userStream = stream;
-        userVideo.srcObject = stream;
         socket.emit('user joined room', roomId);
 
         socket.on('all other users', (otherUsers) => callOtherUsers(otherUsers, stream));
@@ -160,9 +160,9 @@ async function init() {
 
         socket.on('user disconnected', (userId) => handleDisconnect(userId));
 
-        socket.on('hide cam', hideCam);
+        socket.on('hide cam', mute);
 
-        socket.on("show cam", showCam);
+        socket.on("show cam", unmute);
 
         socket.on('server is full', () => alert("chat is full"));
     });
