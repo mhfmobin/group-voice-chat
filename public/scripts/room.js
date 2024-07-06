@@ -24,6 +24,11 @@ function createPeer(userIdToCall) {
         iceServers: [
             {
                 urls: "stun:stun.l.google.com:19302"
+            },
+            {
+                urls: 'turn:5.198.179.89:3478',
+                username: 'mhfmobin',
+                credential: 'M0h@rr@m1403'
             }
         ]
     });
@@ -123,15 +128,15 @@ toggleButton.addEventListener('click', () => {
     }
 });
 
-chatContainer.addEventListener('click', (e) => {
-    if (e.target.innerHTML.includes('Mute')) {
-        e.target.innerHTML = 'Unmute user';
-        socket.emit('hide remote cam', e.target.getAttribute('user-id'));
-    } else {
-        e.target.innerHTML = `Mute user`;
-        socket.emit('show remote cam', e.target.getAttribute('user-id'));
-    }
-})
+// chatContainer.addEventListener('click', (e) => {
+//     if (e.target.innerHTML.includes('Mute')) {
+//         e.target.innerHTML = 'Unmute user';
+//         socket.emit('hide remote cam', e.target.getAttribute('user-id'));
+//     } else {
+//         e.target.innerHTML = `Mute user`;
+//         socket.emit('show remote cam', e.target.getAttribute('user-id'));
+//     }
+// })
 
 function mute() {
     const audioTrack = userStream.getTracks().find(track => track.kind === 'audio');
