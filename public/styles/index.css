@@ -54,12 +54,12 @@ body {
 }
 
 .button {
-    background-color: indigo;
+    background-color: #0d6efd;
     color: white;
     padding: 14px;
     box-sizing: border-box;
     font-size: 18px;
-    font-family: tahoma;
+    font-family: sans-serif;
     border: none;
     border-radius: 12px;
     letter-spacing: 2px;
